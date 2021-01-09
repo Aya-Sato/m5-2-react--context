@@ -10,11 +10,27 @@ import useInterval from "../hooks/use-interval.hook";
 import { GameContext } from './GameContext';
 
 function App() {
-  const { numCookies, setNumCookies, cookiesPerSecond } = useContext(GameContext);
+  const { numCookies, setNumCookies, purchasedItems, cookiesPerSecond } = useContext(GameContext);
   
   useInterval(() => {
     setNumCookies(numCookies + cookiesPerSecond);
   }, 1000);
+
+  window.onunload = window.onbeforeunload = () => {
+    if (purchasedItems.cursor > 0 || purchasedItems.grandma > 0 || purchasedItems.farm > 0) {
+      const oldTime = JSON.stringify(Date.now());
+      localStorage.setItem('timeClosed', oldTime);
+  }}
+
+  window.onload = () => {
+    if (localStorage.getItem('timeClosed') !== null) {
+      const timeClosed = JSON.parse(localStorage.getItem('timeClosed'));
+      const newTime = Date.now();
+      const diffInSeconds = Math.floor((newTime - timeClosed) / 1000);
+      const cookiesGeneratedWhileClosed = cookiesPerSecond * diffInSeconds;
+      setNumCookies(numCookies + cookiesGeneratedWhileClosed);
+    }
+  }
 
   return (
     <>
