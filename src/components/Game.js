@@ -1,33 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-
-import useInterval from "../hooks/use-interval.hook";
 
 import cookieSrc from "../cookie.svg";
 import Item from "./Item";
 import items from './Data';
 
-const calculateCookiesPerSecond = (purchasedItems) => {
-  return Object.keys(purchasedItems).reduce((acc, itemId) => {
-    const numOwned = purchasedItems[itemId];
-    const item = items.find((item) => item.id === itemId);
-    const value = item.value;
+import { GameContext } from "./GameContext";
 
-    return acc + value * numOwned;
-  }, 0);
-};
+const Game = () => {
+  const { numCookies, setNumCookies, purchasedItems, setPurchasedItems, cookiesPerSecond } = useContext(GameContext);
 
-const Game = ({ numCookies, setNumCookies, purchasedItems, setPurchasedItems }) => {
   const incrementCookies = () => {
     setNumCookies((c) => c + 1);
   };
-
-  useInterval(() => {
-    const numOfGeneratedCookies = calculateCookiesPerSecond(purchasedItems);
-
-    setNumCookies(numCookies + numOfGeneratedCookies);
-  }, 1000);
 
   React.useEffect(() => {
     document.title = `${numCookies} cookies - Cookie Clicker Workshop`;
@@ -56,7 +42,7 @@ const Game = ({ numCookies, setNumCookies, purchasedItems, setPurchasedItems }) 
       <GameArea>
         <Indicator>
           <Total>{numCookies} cookies</Total>
-          <strong>{calculateCookiesPerSecond(purchasedItems)}</strong> cookies
+          <strong>{cookiesPerSecond}</strong> cookies
           per second
         </Indicator>
         <Button onClick={incrementCookies}>

@@ -1,20 +1,20 @@
-import React from "react";
+import React, { useContext } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import GlobalStyles from "./GlobalStyles";
 import Home from "./Home";
 import Game from "./Game";
 
-import usePersistedState from '../hooks/use-persisted-state.hook';
+import useInterval from "../hooks/use-interval.hook";
 
-function App(props) {
-  const [numCookies, setNumCookies] = usePersistedState(1000, 'num-cookies');
+import { GameContext } from './GameContext';
 
-  const [purchasedItems, setPurchasedItems] = usePersistedState({
-    cursor: 0,
-    grandma: 0,
-    farm: 0,
-  }, 'purchasedItems');
+function App() {
+  const { numCookies, setNumCookies, cookiesPerSecond } = useContext(GameContext);
+  
+  useInterval(() => {
+    setNumCookies(numCookies + cookiesPerSecond);
+  }, 1000);
 
   return (
     <>
@@ -24,12 +24,7 @@ function App(props) {
           <Home />
         </Route>
         <Route path="/game">
-          <Game 
-            numCookies={numCookies}
-            setNumCookies={setNumCookies}
-            purchasedItems={purchasedItems}
-            setPurchasedItems={setPurchasedItems}
-          />
+          <Game />
         </Route>
       </Router>
     </>
